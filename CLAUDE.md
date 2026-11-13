@@ -1,0 +1,74 @@
+# Fire and Smoke Detection project: handoff notes
+
+These notes carry over an earlier conversation with Claude so a new Claude Code
+session in VS Code can continue where it left off.
+
+## How to work with me
+- I'm a student. Go **one small step at a time**, in plain language. Too much at once overwhelms me.
+- Before giving a new step, wait for me to report the result of the last one.
+- I work in VS Code on Windows (PowerShell), Lenovo ThinkPad X1 Carbon, Intel Core Ultra 7 256V, no NVIDIA GPU (CPU only).
+- Remind me which stage we're in when we move on.
+
+## Project (from my proposal)
+Fire and Smoke Detection Using Computer Vision.
+Objective: detect early fire hazards from images/videos. Techniques: YOLO, CNN, segmentation.
+Dataset: D-Fire (FireNet optional). Extension: real-time emergency alert system.
+
+## Stages
+| Stage | What | Status |
+|---|---|---|
+| 1 | CNN classifier: whole photo is none / smoke / fire / both | **Done** |
+| 2 | YOLO detection: boxes around fire and smoke | **In progress** |
+| 3 | Segmentation (optional) | Later |
+| 4 | Real-time alert from webcam/video (OpenCV + YOLO, alert after several frames in a row) | Later |
+
+## Project folder: `D:\Y3 S1\Project Practicum\DFire_detection`
+- `DFire/` original D-Fire download, already split: `train/images`, `train/labels`, `test/images`, `test/labels`. Do not modify.
+- `DFire_splits/` official lists `dfire_train.txt`, `dfire_test.txt` (may be missing; optional).
+- `Dataset_fire/` built by `build_fire_dataset.py` (version 5) for Stage 1: `train` / `validation` / `test`, each with `none`, `smoke`, `fire`, `both`.
+  Counts: train 1530/1530/803/1530, val 270/270/141/270, test 400/400/220/400 (none/smoke/fire/both).
+- `Fire_Stage1_CNN.ipynb` teacher's CNN adapted to 4 classes (200x200, 10 epochs, class weights). Saves `models/fire_cnn_stage1.h5`.
+- `Fire_Stage1_Improved.ipynb` MobileNetV2 transfer learning (224x224, augmentation, early stopping). Saves `models/fire_mobilenet_stageB.keras`.
+- `dfire.yaml` YOLO data config (see Stage 2).
+
+## Key facts
+- D-Fire label files are YOLO format: `class cx cy w h`, normalized 0-1. Empty file = no fire/smoke.
+- **Class IDs: 0 = smoke, 1 = fire.** Confirmed by matching published counts (1,164 fire-only, 5,867 smoke-only, 4,658 both) and by checking label files against images.
+- Validation for Stage 1 was a random 15% of the training images (D-Fire has no official validation list).
+- The "Test accuracy" printed right after training in the baseline notebook is measured on training data. Always report the "Real test accuracy".
+
+## Stage 1 results (1,420 test images)
+| Model | Real test accuracy |
+|---|---|
+| Baseline CNN (teacher's) | 70.14% (overfits: train 97.7%, val ~70%, val loss lowest at epoch 2) |
+| MobileNetV2 fine-tuned | 78.87% (much less overfitting) |
+
+Baseline weakest: smoke recall 0.59; often guesses "both". MobileNetV2: smoke recall 0.74, but more smoke photos called "none" (83 vs 49).
+Remaining errors: tiny flames at night, faint smoke, ambiguous hazy scenes, possible label noise.
+All numbers are also saved in a claude.ai Sheet called "Fire and Smoke Stage 1 Results".
+
+## Environments
+- TensorFlow work (Stage 1): the environment used for the notebooks (the one with TensorFlow installed).
+- YOLO work (Stage 2+): `.venv-yolo` in the project folder, Python 3.14.7, torch 2.15.0+cpu, ultralytics 8.4.211.
+  Activate with `.venv-yolo\Scripts\activate`.
+- `yolo predict model=yolo26n.pt source=https://ultralytics.com/images/bus.jpg` worked: 4 persons + 1 bus, ~115 ms per image on CPU.
+
+## Where we stopped (Stage 2, step 2-3)
+1. Create `dfire.yaml` in the project folder (absolute path needed, since Ultralytics resolves relative paths against its own datasets folder):
+   ```yaml
+   path: D:/Y3 S1/Project Practicum/DFire_detection/DFire
+   train: train/images
+   val: test/images
+   names:
+     0: smoke
+     1: fire
+   ```
+   Note: this uses the test images for validation, so the final test score isn't fully independent. Tighten this before the real training run (e.g. carve a validation set from train).
+2. Tiny test run to check everything connects and time one epoch:
+   ```
+   yolo detect train data=dfire.yaml model=yolo26n.pt epochs=1 imgsz=320 fraction=0.05 batch=16
+   ```
+   **Done 2026-11-13** (`runs/detect/tiny_test`): pipeline works. 861 train images took ~1 min (~1.1 s per batch of 16), validating 4,302 test images ~1.5 min.
+   Scores ~0 as expected (the 5% slice was the first files alphabetically, 859 of 861 empty). Estimate: full epoch ~20 min at imgsz=320, ~80 min at 640 on this CPU.
+   YOLO flagged 4 test labels as out-of-bounds (ignored) and re-saved 12 slightly corrupt test JPEGs in place (WEB11243-WEB11323).
+3. Next: decide whether full training is feasible on CPU, or use a free cloud GPU (Kaggle/Colab) for training and bring `best.pt` back to the laptop.

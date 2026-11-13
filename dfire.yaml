@@ -1,0 +1,6 @@
+path: D:/Y3 S1/Project Practicum/DFire_detection/DFire
+train: train/images
+val: test/images
+names:
+  0: smoke
+  1: fire

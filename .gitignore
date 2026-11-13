@@ -1,0 +1,19 @@
+# datasets (too big, you have them locally)
+DFire/
+DFire_splits/
+Dataset_fire/
+
+# Python environments
+.venv/
+.venv-yolo/
+__pycache__/
+
+# trained models and YOLO outputs
+models/
+runs/
+*.pt
+*.h5
+*.keras
+
+# test images
+bus.jpg
