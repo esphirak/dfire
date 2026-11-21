@@ -47,6 +47,9 @@ Baseline weakest: smoke recall 0.59; often guesses "both". MobileNetV2: smoke re
 Remaining errors: tiny flames at night, faint smoke, ambiguous hazy scenes, possible label noise.
 All numbers are also saved in a claude.ai Sheet called "Fire and Smoke Stage 1 Results".
 
+**Project log doc:** "Fire and Smoke Detection Project Log" (https://claude.ai/artifact/FceifSJdXeN6pX3cwn3L8h).
+Update it every time a stage finishes: the stage table's status, the stage's own section, and the presentation outline.
+
 ## Environments
 - TensorFlow work (Stage 1): the environment used for the notebooks (the one with TensorFlow installed).
 - YOLO work (Stage 2+): `.venv-yolo` in the project folder, Python 3.14.7, torch 2.15.0+cpu, ultralytics 8.4.211.
