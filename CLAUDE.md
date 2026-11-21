@@ -71,4 +71,9 @@ All numbers are also saved in a claude.ai Sheet called "Fire and Smoke Stage 1 R
    **Done 2026-11-13** (`runs/detect/tiny_test`): pipeline works. 861 train images took ~1 min (~1.1 s per batch of 16), validating 4,302 test images ~1.5 min.
    Scores ~0 as expected (the 5% slice was the first files alphabetically, 859 of 861 empty). Estimate: full epoch ~20 min at imgsz=320, ~80 min at 640 on this CPU.
    YOLO flagged 4 test labels as out-of-bounds (ignored) and re-saved 12 slightly corrupt test JPEGs in place (WEB11243-WEB11323).
-3. Next: decide whether full training is feasible on CPU, or use a free cloud GPU (Kaggle/Colab) for training and bring `best.pt` back to the laptop.
+3. Decided: full training is too slow on this CPU, so it runs on **Kaggle (free GPU)**. Kaggle already hosts D-Fire, so no upload.
+4. **Next: `Stage2_YOLO_Kaggle.ipynb`** (in this repo). Run it on Kaggle: add the D-Fire dataset as input, GPU on, Internet on.
+   First with `QUICK = True` (~5 min check), then `QUICK = False` via Save Version → Save & Run All.
+   It checks 0 = smoke / 1 = fire against the published counts, keeps 15% of train aside for validation in blocks of 50
+   consecutive file names (neighbouring video frames are near-copies), trains yolo26n at 640, tests on the official test set,
+   and collects `best.pt` + plots in `/kaggle/working/to_download`. Download `best.pt` to the laptop project folder (git-ignored).
