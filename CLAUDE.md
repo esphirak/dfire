@@ -80,3 +80,10 @@ Update it every time a stage finishes: the stage table's status, the stage's own
    It checks 0 = smoke / 1 = fire against the published counts, keeps 15% of train aside for validation in blocks of 50
    consecutive file names (neighbouring video frames are near-copies), trains yolo26n at 640, tests on the official test set,
    and collects `best.pt` + plots in `/kaggle/working/to_download`. Download `best.pt` to the laptop project folder (git-ignored).
+5. **Kaggle QUICK run done 2026-11-21.** Kaggle copy = sayedgamal99/smoke-fire-detection-yolo (GAIA's D-Fire):
+   train 14,122 / val 3,099 / test 4,306 (its own val folder is used). Label check matched exactly
+   (both 4,658, none 9,838, smoke-only 5,867, fire-only 1,164). 1 epoch on 1,500 images: 41 s on a Tesla T4, mAP50 0.03 (expected for 1 epoch).
+   Found: the Kaggle input drive is slow (~8 MB/s) and read-only, so epochs wait on photo reads, and YOLO skipped
+   ~0.2% slightly corrupt JPEGs it couldn't repair in place. Added cell 3b: in the full run the dataset is copied
+   to `/tmp/dfire_local` first (~10 min), which fixes both.
+6. **Next:** set `QUICK = False`, add cell 3b to the Kaggle notebook, then Save Version → Save & Run All.
