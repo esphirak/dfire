@@ -1,4 +1,4 @@
-path: D:/Y3 S1/Project Practicum/DFire_detection/DFire
+path: D:/Y3 S1/Project Practicum/dfire/DFire
 train: train/images
 val: test/images
 names:

@@ -22,7 +22,7 @@ Dataset: D-Fire (FireNet optional). Extension: real-time emergency alert system.
 | 3 | Segmentation (optional) | Later |
 | 4 | Real-time alert from webcam/video (OpenCV + YOLO, alert after several frames in a row) | Later |
 
-## Project folder: `D:\Y3 S1\Project Practicum\DFire_detection`
+## Project folder: `D:\Y3 S1\Project Practicum\dfire`
 - `DFire/` original D-Fire download, already split: `train/images`, `train/labels`, `test/images`, `test/labels`. Do not modify.
 - `DFire_splits/` official lists `dfire_train.txt`, `dfire_test.txt` (may be missing; optional).
 - `Dataset_fire/` built by `build_fire_dataset.py` (version 5) for Stage 1: `train` / `validation` / `test`, each with `none`, `smoke`, `fire`, `both`.
@@ -56,7 +56,7 @@ All numbers are also saved in a claude.ai Sheet called "Fire and Smoke Stage 1 R
 ## Where we stopped (Stage 2, step 2-3)
 1. Create `dfire.yaml` in the project folder (absolute path needed, since Ultralytics resolves relative paths against its own datasets folder):
    ```yaml
-   path: D:/Y3 S1/Project Practicum/DFire_detection/DFire
+   path: D:/Y3 S1/Project Practicum/dfire/DFire
    train: train/images
    val: test/images
    names:
