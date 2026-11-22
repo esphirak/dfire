@@ -86,4 +86,13 @@ Update it every time a stage finishes: the stage table's status, the stage's own
    Found: the Kaggle input drive is slow (~8 MB/s) and read-only, so epochs wait on photo reads, and YOLO skipped
    ~0.2% slightly corrupt JPEGs it couldn't repair in place. Added cell 3b: in the full run the dataset is copied
    to `/tmp/dfire_local` first (~10 min), which fixes both.
-6. **Next:** set `QUICK = False`, add cell 3b to the Kaggle notebook, then Save Version → Save & Run All.
+6. **Full Kaggle run done 2026-11-22** (QUICK = False, with cell 3b). Test results on the 4,306 official test photos:
+   | Measure | Smoke | Fire | Overall |
+   |---|---|---|---|
+   | Precision | 0.841 | 0.726 | 0.783 |
+   | Recall | 0.797 | 0.664 | 0.731 |
+   | mAP50 | 0.843 | 0.715 | 0.779 |
+   | mAP50-95 | 0.520 | 0.376 | 0.448 |
+   Fire is harder than smoke (fire boxes are often tiny, e.g. small flames at night). Number of epochs trained: not yet reported.
+7. **Next:** download `best.pt` + plots from the version's Output tab (`to_download/`) into the laptop project folder,
+   then try the model on a few photos/videos on the laptop. That finishes Stage 2; then Stage 4.
