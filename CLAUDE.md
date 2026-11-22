@@ -93,6 +93,9 @@ Update it every time a stage finishes: the stage table's status, the stage's own
    | Recall | 0.797 | 0.664 | 0.731 |
    | mAP50 | 0.843 | 0.715 | 0.779 |
    | mAP50-95 | 0.520 | 0.376 | 0.448 |
-   Fire is harder than smoke (fire boxes are often tiny, e.g. small flames at night). Number of epochs trained: not yet reported.
+   Fire is harder than smoke (fire boxes are often tiny, e.g. small flames at night). Trained all 60 epochs; val mAP50 plateaued ~0.785
+   from epoch ~40 (val 0.787 vs test 0.779, so no leak). Smoke/fire almost never confused (test: 30 fire->smoke, 18 smoke->fire);
+   missed: 81 smoke, 172 fire. Confusion-matrix background counts are at conf 0.001, not real false alarms.
+   Best F1 0.75 at confidence ~0.34 -> starting threshold for Stage 4. Plots are in the laptop project folder.
 7. **Next:** download `best.pt` + plots from the version's Output tab (`to_download/`) into the laptop project folder,
    then try the model on a few photos/videos on the laptop. That finishes Stage 2; then Stage 4.
