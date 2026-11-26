@@ -1,0 +1,139 @@
+FIRE AND SMOKE DETECTION: COMMAND CHEAT SHEET
+=============================================
+Type these in the VS Code terminal (PowerShell). Run one line at a time.
+Lines starting with # are notes, not commands.
+
+
+1. EVERY TIME YOU OPEN A NEW TERMINAL
+-------------------------------------
+cd "D:\Y3 S1\Project Practicum\dfire"
+.venv-yolo\Scripts\activate
+
+# The prompt should now start with (.venv-yolo) and end with dfire>
+# If it shows another name in brackets, like (.venv), type:  deactivate   then activate again.
+# If PowerShell says "running scripts is disabled", run this, then activate again:
+Set-ExecutionPolicy -Scope Process Bypass
+
+
+2. GET THE LATEST CODE FROM GITHUB
+----------------------------------
+git pull
+
+# If git pull refuses because you changed a file yourself:
+git stash
+git pull
+
+
+3. REAL-TIME ALERT (STAGE 4)
+----------------------------
+# Laptop's built-in webcam:
+python stage4_alert.py
+
+# External webcam (usually 1; try 2 if 1 doesn't work):
+python stage4_alert.py --source 1
+
+# Which camera numbers exist? (prints e.g. [0, 1])
+python -c "import cv2; print([i for i in range(5) if cv2.VideoCapture(i).isOpened()])"
+
+# A video file (use quotes if the path has spaces):
+python stage4_alert.py --source videos\fire1.mp4
+python stage4_alert.py --source "D:\Videos\my fire clip.mp4"
+
+# Bigger window (good for tall/vertical videos; default is 720):
+python stage4_alert.py --source videos\fire1.mp4 --display-height 900
+
+# Several videos in a row (put them all in the videos folder first):
+foreach ($v in Get-ChildItem videos\*.mp4) { Write-Host "Now playing: $($v.Name)"; python stage4_alert.py --source $v.FullName }
+# For .avi or .mov videos too, change *.mp4 to *.*
+
+# HOW TO STOP:
+#   Click the VIDEO WINDOW, then press Q  -> stops (or skips to the next video in the loop).
+#   Ctrl+C in the terminal               -> stops everything. The long "KeyboardInterrupt" message is harmless.
+# Alert snapshots are saved in the alerts folder.
+# The window can be resized with the mouse.
+
+
+4. TEST VIDEO FROM REAL D-FIRE TEST PHOTOS
+------------------------------------------
+# Needs the DFire folder (only on the laptop that has the dataset).
+# Makes test_video.mp4: 1 minute, none -> smoke -> fire -> both, 5 seconds each, true answer written underneath.
+python make_test_video.py
+python stage4_alert.py --source test_video.mp4
+
+# A different random set of photos (any number):
+python make_test_video.py --seed 2
+
+# Longer or slower:
+python make_test_video.py --seconds 120 --per-photo 4
+
+
+5. RUN THE MODEL ON ONE PHOTO (STAGE 2)
+---------------------------------------
+# A random TEST photo that contains fire:
+$f = Get-ChildItem DFire\test\labels\*.txt | Where-Object { (Get-Content $_) -match '^1 ' } | Get-Random
+$img = "DFire\test\images\$($f.BaseName).jpg"
+yolo predict model=models/yolo_stage2/best.pt source=$img conf=0.34
+
+# Any photo you choose:
+yolo predict model=models/yolo_stage2/best.pt source="path\to\photo.jpg" conf=0.34
+
+# The result is saved in runs\detect\predict-N (the folder with the highest number).
+
+
+6. SETTING UP A NEW LAPTOP (ONE TIME ONLY)
+------------------------------------------
+# a) Get the code:
+git clone https://github.com/esphirak/dfire
+cd dfire
+
+# b) Check Python (3.12 or 3.13 is fine). If not found, install from python.org and tick "Add python.exe to PATH":
+py --version
+
+# c) Make the environment and install YOLO (big download, a few minutes):
+py -m venv .venv-yolo
+.venv-yolo\Scripts\activate
+pip install ultralytics
+
+# d) Copy the trained model (NOT on GitHub) into models\yolo_stage2\best.pt
+#    from the other laptop (USB / Google Drive), or download again from Kaggle's Output tab.
+#    If it downloads as best.zip: DON'T extract it, just rename it to best.pt.
+Test-Path models\yolo_stage2\best.pt
+#    -> must print True
+
+# e) The DFire dataset folder is not on GitHub either. Copy it over only if you need sections 4 or 5.
+
+
+7. COMMON ERRORS AND FIXES
+--------------------------
+"python is not recognized"
+    -> You forgot to activate (section 1), or Python isn't installed (section 6b).
+
+"yolo is not recognized"
+    -> Activate first (section 1).
+
+"Fatal error in launcher: Unable to create process"  (happens after renaming/moving the project folder)
+    -> python -m pip install --force-reinstall --no-deps ultralytics
+
+"No such file or directory: models\yolo_stage2\best.pt"
+    -> The model is missing or misnamed. Check with:  Test-Path models\yolo_stage2\best.pt
+       Find it with:  Get-ChildItem -Recurse -Filter best.pt | Select-Object FullName
+
+"... .jpg does not exist"
+    -> The photo isn't there. Check the folder name (test vs train) and the file name.
+
+"Could not open video source"
+    -> Wrong camera number (try --source 1 or 2) or wrong video path.
+
+The video window is cut off
+    -> Use --display-height 600 (smaller) or resize the window with the mouse.
+
+Nothing happens when pressing Q
+    -> Click on the video window first, then press Q.
+
+
+8. KEY NUMBERS (for the presentation)
+-------------------------------------
+Stage 1  Teacher's CNN: 70.14% test accuracy     MobileNetV2: 78.87%
+Stage 2  YOLO26n on 4,306 test photos: mAP50 0.779 (smoke 0.843, fire 0.715), precision 0.783, recall 0.731
+Stage 4  Webcam on this laptop (no GPU): about 16.7 frames per second
+         Alert rule: fire or smoke in at least 5 of the last 8 frames.  Confidence threshold: 0.34

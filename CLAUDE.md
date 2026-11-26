@@ -30,6 +30,7 @@ Dataset: D-Fire (FireNet optional). Extension: real-time emergency alert system.
 - `Fire_Stage1_CNN.ipynb` teacher's CNN adapted to 4 classes (200x200, 10 epochs, class weights). Saves `models/fire_cnn_stage1.h5`.
 - `Fire_Stage1_Improved.ipynb` MobileNetV2 transfer learning (224x224, augmentation, early stopping). Saves `models/fire_mobilenet_stageB.keras`.
 - `dfire.yaml` YOLO data config (see Stage 2).
+- `COMMANDS.txt` plain-language cheat sheet of every command (setup, alert, test video, errors). Keep it updated when commands change.
 
 ## Key facts
 - D-Fire label files are YOLO format: `class cx cy w h`, normalized 0-1. Empty file = no fire/smoke.
