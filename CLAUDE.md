@@ -18,9 +18,9 @@ Dataset: D-Fire (FireNet optional). Extension: real-time emergency alert system.
 | Stage | What | Status |
 |---|---|---|
 | 1 | CNN classifier: whole photo is none / smoke / fire / both | **Done** |
-| 2 | YOLO detection: boxes around fire and smoke | **In progress** |
+| 2 | YOLO detection: boxes around fire and smoke | **Done** |
 | 3 | Segmentation (optional) | Later |
-| 4 | Real-time alert from webcam/video (OpenCV + YOLO, alert after several frames in a row) | Later |
+| 4 | Real-time alert from webcam/video (OpenCV + YOLO, alert after several frames in a row) | **Next** |
 
 ## Project folder: `D:\Y3 S1\Project Practicum\dfire`
 - `DFire/` original D-Fire download, already split: `train/images`, `train/labels`, `test/images`, `test/labels`. Do not modify.
@@ -97,5 +97,15 @@ Update it every time a stage finishes: the stage table's status, the stage's own
    from epoch ~40 (val 0.787 vs test 0.779, so no leak). Smoke/fire almost never confused (test: 30 fire->smoke, 18 smoke->fire);
    missed: 81 smoke, 172 fire. Confusion-matrix background counts are at conf 0.001, not real false alarms.
    Best F1 0.75 at confidence ~0.34 -> starting threshold for Stage 4. Plots are in the laptop project folder.
-7. **Next:** download `best.pt` + plots from the version's Output tab (`to_download/`) into the laptop project folder,
-   then try the model on a few photos/videos on the laptop. That finishes Stage 2; then Stage 4.
+7. **Stage 2 finished 2026-11-26.** Trained model is at `models/yolo_stage2/best.pt` (5.3 MB; git-ignored).
+   Gotchas met on the way:
+   - A `.pt` file is a zip inside: Windows/browser may save it as `best.zip`. Never "Extract All"; just rename to `best.pt`.
+   - The project folder was renamed from `DFire_detection` to `dfire`, which broke `.venv-yolo`'s `yolo.exe` launcher
+     (hard-coded old path). Fixed with `python -m pip install --force-reinstall --no-deps ultralytics`.
+   - Always `cd "D:\Y3 S1\Project Practicum\dfire"` and `.venv-yolo\Scripts\activate` first (another project, D:\risin_ai, has its own .venv).
+   Laptop test: random fire test photo chosen with
+   `$f = Get-ChildItem DFire\test\labels\*.txt | Where-Object { (Get-Content $_) -match '^1 ' } | Get-Random`,
+   then `yolo predict model=models/yolo_stage2/best.pt source="DFire\test\images\$($f.BaseName).jpg" conf=0.34`.
+   AoF07894.jpg (night camera frame): tiny distant flame boxed as fire 0.72. Results go to `runs/detect/predict-N`.
+8. **Next: Stage 4, real-time alert.** Small Python script: OpenCV reads webcam or a video file, runs `best.pt` each frame
+   (conf ~0.34), draws boxes live, raises ALERT only when fire/smoke is seen in several consecutive frames.
