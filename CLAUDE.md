@@ -111,4 +111,8 @@ Update it every time a stage finishes: the stage table's status, the stage's own
    (conf ~0.34), draws boxes live, raises ALERT only when fire/smoke is seen in several consecutive frames.
    **Written 2026-11-26: `stage4_alert.py`.** `python stage4_alert.py` (webcam) or `--source video.mp4`. Alert rule:
    ALERT when at least 5 of the last 8 frames had fire or smoke (AlertTracker); snapshot saved to `alerts/` (git-ignored)
-   when an alert starts; shows FPS; Q quits. Not yet run on the laptop.
+   when an alert starts; shows FPS; Q quits.
+   **First laptop run 2026-11-26: works.** Webcam at 16.7 FPS on CPU. Wildfire video on a phone held to the webcam:
+   smoke 0.80, fire 0.34 / 0.36 -> "ALERT: FIRE + SMOKE DETECTED". Fire confidence is low through a phone screen.
+   Stop it by clicking the video window and pressing Q (Ctrl+C in the terminal gives a harmless KeyboardInterrupt).
+   **Next:** false-alarm test: point the webcam at an ordinary room, a lamp, red/orange objects; it should stay "Monitoring...".
