@@ -109,3 +109,6 @@ Update it every time a stage finishes: the stage table's status, the stage's own
    AoF07894.jpg (night camera frame): tiny distant flame boxed as fire 0.72. Results go to `runs/detect/predict-N`.
 8. **Next: Stage 4, real-time alert.** Small Python script: OpenCV reads webcam or a video file, runs `best.pt` each frame
    (conf ~0.34), draws boxes live, raises ALERT only when fire/smoke is seen in several consecutive frames.
+   **Written 2026-11-26: `stage4_alert.py`.** `python stage4_alert.py` (webcam) or `--source video.mp4`. Alert rule:
+   ALERT when at least 5 of the last 8 frames had fire or smoke (AlertTracker); snapshot saved to `alerts/` (git-ignored)
+   when an alert starts; shows FPS; Q quits. Not yet run on the laptop.
