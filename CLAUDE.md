@@ -117,6 +117,10 @@ Update it every time a stage finishes: the stage table's status, the stage's own
    Stop it by clicking the video window and pressing Q (Ctrl+C in the terminal gives a harmless KeyboardInterrupt).
    **Next:** false-alarm test: point the webcam at an ordinary room, a lamp, red/orange objects; it should stay "Monitoring...".
    Other camera: `--source 1` (external webcam is usually 1). Video file: `--source video.mp4`.
+   Tall/vertical videos: the window is shrunk to fit (default max 720 px tall, 1280 wide; `--display-height 900` for bigger)
+   and can be resized with the mouse; the model still sees the full-size frame. FPS now bottom-left.
+   Several videos in a row: put them in `videos\` and run
+   `foreach ($v in Get-ChildItem videos\*.mp4) { python stage4_alert.py --source $v.FullName }` (Q = next video, Ctrl+C = stop).
    **`make_test_video.py`** (2026-11-26): builds a 60 s `test_video.mp4` from random D-Fire TEST photos cycling
    none -> smoke -> fire -> both, 5 s each, true answer written under each photo (top 60 px left free for the alert banner).
    `python make_test_video.py [--seed N]`, then `python stage4_alert.py --source test_video.mp4`. Still photos, not moving fire.

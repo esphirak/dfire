@@ -8,7 +8,8 @@ does not set it off. Each time an alert starts, a snapshot is saved in alerts/.
 Run from the project folder, with .venv-yolo active:
     python stage4_alert.py                     # webcam
     python stage4_alert.py --source my_video.mp4
-Press Q in the video window to stop.
+    python stage4_alert.py --source my_video.mp4 --display-height 900   # bigger window
+Press Q in the video window to stop. The window can also be resized with the mouse.
 """
 import argparse
 import time
@@ -24,6 +25,8 @@ CONF = 0.34          # confidence threshold; 0.34 gave the best F1 on the test p
 WINDOW = 8           # look at the last 8 frames ...
 NEEDED = 5           # ... and raise the alert if at least 5 of them had fire or smoke
 SNAPSHOT_DIR = Path('alerts')
+DISPLAY_HEIGHT = 720 # the window is shrunk to at most this tall (and 1280 wide) so tall videos fit the screen
+WINDOW_NAME = 'Fire and smoke alert (press Q to quit)'
 
 
 class AlertTracker:
@@ -42,14 +45,26 @@ class AlertTracker:
         return self.active and not was_active
 
 
+def fit_for_screen(frame, max_height, max_width=1280):
+    """Shrink a frame (keeping its shape) so it fits on screen. Only the display is shrunk, not what the model sees."""
+    h, w = frame.shape[:2]
+    scale = min(1.0, max_height / h, max_width / w)
+    if scale < 1.0:
+        frame = cv2.resize(frame, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
+    return frame
+
+
 def draw_banner(frame, text, colour):
-    cv2.rectangle(frame, (0, 0), (frame.shape[1], 50), colour, -1)
-    cv2.putText(frame, text, (15, 35), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
+    font = min(1.0, frame.shape[1] / 700)      # smaller text on narrow (vertical) videos
+    height = int(20 + 30 * font)
+    cv2.rectangle(frame, (0, 0), (frame.shape[1], height), colour, -1)
+    cv2.putText(frame, text, (10, int(height * 0.7)), cv2.FONT_HERSHEY_SIMPLEX, font, (255, 255, 255), 2)
 
 
 def main():
     parser = argparse.ArgumentParser(description='Real-time fire and smoke alert')
     parser.add_argument('--source', default='0', help='0 for the webcam, or the path of a video file')
+    parser.add_argument('--display-height', type=int, default=DISPLAY_HEIGHT, help='largest window height in pixels')
     args = parser.parse_args()
     source = int(args.source) if args.source.isdigit() else args.source
 
@@ -62,6 +77,7 @@ def main():
     tracker = AlertTracker()
     last_time = time.time()
     last_labels = set()   # what was seen most recently, kept for the banner
+    cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)   # resizable, keeps the shape
 
     while True:
         ok, frame = video.read()
@@ -77,8 +93,10 @@ def main():
 
         if tracker.update(len(found) > 0):
             stamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-            cv2.imwrite(str(SNAPSHOT_DIR / f'alert_{stamp}.jpg'), shown)
+            cv2.imwrite(str(SNAPSHOT_DIR / f'alert_{stamp}.jpg'), shown)   # full size, before shrinking
             print(f'ALERT at {stamp}: {", ".join(sorted(last_labels))}')
+
+        shown = fit_for_screen(shown, args.display_height)
 
         if tracker.active:
             draw_banner(shown, 'ALERT: ' + ' + '.join(sorted(last_labels)).upper() + ' DETECTED', (0, 0, 220))
@@ -88,10 +106,10 @@ def main():
         now = time.time()
         fps = 1 / max(now - last_time, 1e-6)
         last_time = now
-        cv2.putText(shown, f'{fps:.1f} FPS', (shown.shape[1] - 140, 35),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        cv2.putText(shown, f'{fps:.1f} FPS', (10, shown.shape[0] - 15),       # bottom-left corner
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
-        cv2.imshow('Fire and smoke alert (press Q to quit)', shown)
+        cv2.imshow(WINDOW_NAME, shown)
         if cv2.waitKey(1) & 0xFF in (ord('q'), ord('Q')):
             break
 
