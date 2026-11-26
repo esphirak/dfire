@@ -1,0 +1,21 @@
+RUN STAGE 4 (real-time fire and smoke alert)
+============================================
+
+First, in every new terminal:
+    cd "D:\Y3 S1\Project Practicum\dfire"
+    .venv-yolo\Scripts\activate
+
+1. Camera
+    python stage4_alert.py --source 0
+    (0 = laptop camera, 1 = external camera)
+
+2. One video in the dfire folder
+    python stage4_alert.py --source myvideo.mp4
+
+3. One video somewhere else (keep the quotes)
+    python stage4_alert.py --source "D:\Videos\myvideo.mp4"
+
+4. Every video in a folder, one after another
+    foreach ($v in Get-ChildItem "D:\Videos\*.mp4") { python stage4_alert.py --source $v.FullName }
+
+To stop: click the video window and press Q (in number 4, Q skips to the next video; Ctrl+C in the terminal stops all).
