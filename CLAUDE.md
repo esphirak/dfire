@@ -116,3 +116,8 @@ Update it every time a stage finishes: the stage table's status, the stage's own
    smoke 0.80, fire 0.34 / 0.36 -> "ALERT: FIRE + SMOKE DETECTED". Fire confidence is low through a phone screen.
    Stop it by clicking the video window and pressing Q (Ctrl+C in the terminal gives a harmless KeyboardInterrupt).
    **Next:** false-alarm test: point the webcam at an ordinary room, a lamp, red/orange objects; it should stay "Monitoring...".
+   Other camera: `--source 1` (external webcam is usually 1). Video file: `--source video.mp4`.
+   **`make_test_video.py`** (2026-11-26): builds a 60 s `test_video.mp4` from random D-Fire TEST photos cycling
+   none -> smoke -> fire -> both, 5 s each, true answer written under each photo (top 60 px left free for the alert banner).
+   `python make_test_video.py [--seed N]`, then `python stage4_alert.py --source test_video.mp4`. Still photos, not moving fire.
+   Project also cloned onto a second laptop (Python 3.13.5 via `py`; needs its own .venv-yolo and a copy of best.pt).

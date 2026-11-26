@@ -19,3 +19,6 @@ runs/
 bus.jpg
 # Stage 4 alert snapshots
 alerts/
+
+# test videos
+*.mp4
