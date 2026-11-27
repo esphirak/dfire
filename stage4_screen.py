@@ -63,10 +63,30 @@ def draw_box(canvas, x1, y1, x2, y2, label, colour):
     canvas.create_text(x1 + 6, ty + 13, text=label, fill='white', anchor='w', font=('Segoe UI', 12, 'bold'))
 
 
-def draw_status(canvas, width, alert_text, fps):
+def draw_beacon(canvas, cx, top, lit):
+    """A small warning beacon. Grey while all is calm; flashing red with light rays while there is a fire alert."""
+    flash = lit and int(time.time() * 3) % 2 == 0       # blinks about 3 times a second
+    dome = ('#ff2a2a' if flash else '#b30000') if lit else '#4a4a4a'
+    lamp = ('#ffd34d' if flash else '#ff7a1a') if lit else '#5c5c5c'
+    shine = '#ffc9c9' if lit else '#6e6e6e'
+    if flash:                                            # light rays around the dome
+        for dx, dy in [(-46, -2), (-40, 18), (46, -2), (40, 18), (-26, -14), (26, -14)]:
+            canvas.create_line(cx + dx * 0.55, top + 28 + dy * 0.55, cx + dx, top + 28 + dy,
+                               fill='#ff4040', width=3)
+    canvas.create_oval(cx - 20, top + 6, cx + 20, top + 44, fill=dome, outline=dome)          # rounded top
+    canvas.create_rectangle(cx - 20, top + 25, cx + 20, top + 54, fill=dome, outline=dome)    # dome body
+    canvas.create_oval(cx - 9, top + 22, cx + 9, top + 40, fill=lamp, outline=lamp)           # lamp inside
+    canvas.create_oval(cx - 14, top + 12, cx - 6, top + 26, fill=shine, outline=shine)        # shine on the glass
+    canvas.create_rectangle(cx - 24, top + 54, cx + 24, top + 60, fill='#3a3a3a', outline='#3a3a3a')  # collar
+    canvas.create_rectangle(cx - 28, top + 60, cx + 28, top + 72, fill='#1e1e1e', outline='#555555')  # base
+
+
+def draw_status(canvas, width, alert_text, fps, fire_alert):
     if alert_text:
         canvas.create_rectangle(width // 2 - 330, 10, width // 2 + 330, 70, fill='#dc0000', outline='#dc0000')
         canvas.create_text(width // 2, 40, text=alert_text, fill='white', font=('Segoe UI', 22, 'bold'))
+    # Beacon just to the left of the alert bar; lights up only for FIRE (not for smoke alone).
+    draw_beacon(canvas, max(width // 2 - 380, 350), 2, fire_alert)
     canvas.create_rectangle(10, 10, 300, 40, fill='#333333', outline='#333333')
     canvas.create_text(20, 25, anchor='w', fill='white', font=('Segoe UI', 11),
                        text=f'Fire watch ON  {fps:.1f} FPS  (Ctrl+Shift+Q stops)')
@@ -125,7 +145,7 @@ def main():
             fps = 1 / max(now - last_time, 1e-6)
             last_time = now
             alert_text = ('ALERT: ' + ' + '.join(sorted(last_labels)).upper() + ' DETECTED') if tracker.active else ''
-            draw_status(canvas, mon['width'], alert_text, fps)
+            draw_status(canvas, mon['width'], alert_text, fps, tracker.active and 'fire' in last_labels)
             root.update()
     except KeyboardInterrupt:
         pass

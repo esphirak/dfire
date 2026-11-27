@@ -128,5 +128,8 @@ Update it every time a stage finishes: the stage table's status, the stage's own
    **`stage4_screen.py`** (2026-11-27): screen version. mss grabs the screen, the model runs on it, and a
    transparent, click-through, always-on-top tkinter layer draws the boxes + alert over the screen; the layer is
    excluded from capture (SetWindowDisplayAffinity WDA_EXCLUDEFROMCAPTURE) so the model doesn't see its own boxes.
-   Needs `pip install mss`. Stop: Ctrl+Shift+Q. Reuses AlertTracker/CONF/MODEL_PATH from stage4_alert.py. Not yet run on the laptop.
+   Needs `python -m pip install mss` (plain `pip` launcher is broken by the folder rename). Stop: Ctrl+Shift+Q.
+   Reuses AlertTracker/CONF/MODEL_PATH from stage4_alert.py. Has a drawn warning beacon left of the alert bar:
+   grey when calm, flashing red with light rays only when the alert is on AND fire (not smoke alone) is seen.
+   Screen version only. Not yet run on the laptop.
    Project also cloned onto a second laptop (Python 3.13.5 via `py`; needs its own .venv-yolo and a copy of best.pt).
