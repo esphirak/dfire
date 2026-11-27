@@ -19,7 +19,7 @@ First, in every new terminal:
     foreach ($v in Get-ChildItem "D:\Videos\*.mp4") { python stage4_alert.py --source $v.FullName }
 
 5. Watch your whole SCREEN (boxes drawn on top of what you're watching)
-    pip install mss        (one time only)
+    python -m pip install mss        (one time only)
     python stage4_screen.py
     Stop with Ctrl+Shift+Q.
 

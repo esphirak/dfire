@@ -52,7 +52,7 @@ foreach ($v in Get-ChildItem videos\*.mp4) { Write-Host "Now playing: $($v.Name)
 # Alert snapshots are saved in the alerts folder.
 
 # Watch your whole SCREEN, with boxes drawn on top of whatever you're watching (Windows only):
-pip install mss
+python -m pip install mss
 python stage4_screen.py
 python stage4_screen.py --monitor 2      # second screen
 # Stop with Ctrl+Shift+Q (works from any window). Mouse clicks go through the boxes as normal.
@@ -119,6 +119,10 @@ Test-Path models\yolo_stage2\best.pt
 
 "Fatal error in launcher: Unable to create process"  (happens after renaming/moving the project folder)
     -> python -m pip install --force-reinstall --no-deps ultralytics
+
+"Fatal error in launcher" when running pip
+    -> Same cause. Use  python -m pip install ...  instead of  pip install ...
+       Or repair pip once:  python -m pip install --force-reinstall pip
 
 "No such file or directory: models\yolo_stage2\best.pt"
     -> The model is missing or misnamed. Check with:  Test-Path models\yolo_stage2\best.pt

@@ -6,7 +6,7 @@ and the alert in a see-through layer on top of whatever you are looking at
 You can keep using your computer normally: mouse clicks go straight through the layer.
 
 Run from the project folder, with .venv-yolo active:
-    pip install mss                  (one time only)
+    python -m pip install mss        (one time only)
     python stage4_screen.py
     python stage4_screen.py --monitor 2      # a second screen
 
