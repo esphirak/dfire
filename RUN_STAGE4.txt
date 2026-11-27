@@ -18,4 +18,9 @@ First, in every new terminal:
 4. Every video in a folder, one after another
     foreach ($v in Get-ChildItem "D:\Videos\*.mp4") { python stage4_alert.py --source $v.FullName }
 
-To stop: click the video window and press Q (in number 4, Q skips to the next video; Ctrl+C in the terminal stops all).
+5. Watch your whole SCREEN (boxes drawn on top of what you're watching)
+    pip install mss        (one time only)
+    python stage4_screen.py
+    Stop with Ctrl+Shift+Q.
+
+To stop numbers 1-4: click the video window and press Q (in number 4, Q skips to the next video; Ctrl+C in the terminal stops all).

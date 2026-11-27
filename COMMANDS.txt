@@ -50,6 +50,12 @@ foreach ($v in Get-ChildItem videos\*.mp4) { Write-Host "Now playing: $($v.Name)
 #   Click the VIDEO WINDOW, then press Q  -> stops (or skips to the next video in the loop).
 #   Ctrl+C in the terminal               -> stops everything. The long "KeyboardInterrupt" message is harmless.
 # Alert snapshots are saved in the alerts folder.
+
+# Watch your whole SCREEN, with boxes drawn on top of whatever you're watching (Windows only):
+pip install mss
+python stage4_screen.py
+python stage4_screen.py --monitor 2      # second screen
+# Stop with Ctrl+Shift+Q (works from any window). Mouse clicks go through the boxes as normal.
 # The window can be resized with the mouse.
 
 
